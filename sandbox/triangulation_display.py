@@ -15,7 +15,7 @@ edges = np.asarray([[0, 2, 4],
                    [1, 4, 3],
                    [4, 2, 3]])
 
-triangulation = tri.Triangulation(vertices[:,0],vertices[:,1], triangles=edges)
+triangulation = tri.Triangulation(vertices[:,0],vertices[:,1])
 
 plt.figure()
 plt.gca().set_aspect('equal')
