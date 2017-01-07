@@ -94,7 +94,7 @@ class ShortestPathFinder(object):
                               '{:.6f},{:.6f}'.format(*start),
                               '{:.6f},{:.6f}'.format(*end))
 
-        return cost, path
+        return cost, tuple((float(p.split(',')[0]), float(p.split(',')[1])) for p in path)
 
     def _get_new_triangulation(self, start, end):
 

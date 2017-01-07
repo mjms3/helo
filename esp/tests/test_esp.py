@@ -28,11 +28,6 @@ class TestGetPathCost(TestCase):
         self.assertAlmostEqual(sqrt(2), pathFinder.get_path_cost(start, end))
 
 
-"""
-Note: all the tests in this class are exact by virtue of the points chosen.
-"""
-
-
 class TestExactShortestPathInSquare(TestCase):
     def setUp(self):
         self.vertices = [(0, 0),
