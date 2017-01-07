@@ -19,13 +19,13 @@ class TestGetPathCost(TestCase):
         start = (0, 1)
         end = (1, 0)
 
-        pathFinder = ShortestPathFinder(vertices, triangles, triangle_weights=triangle_weights)
+        path_finder = ShortestPathFinder(vertices, triangles, triangle_weights=triangle_weights)
 
-        self.assertAlmostEqual(sqrt(2), pathFinder.get_path_cost(start, end))
+        self.assertAlmostEqual(sqrt(2), path_finder.get_path_cost(start, end))
 
-        pathFinder = ShortestPathFinder(vertices, triangles, triangle_weights=triangle_weights[::-1])
+        path_finder = ShortestPathFinder(vertices, triangles, triangle_weights=triangle_weights[::-1])
 
-        self.assertAlmostEqual(sqrt(2), pathFinder.get_path_cost(start, end))
+        self.assertAlmostEqual(sqrt(2), path_finder.get_path_cost(start, end))
 
 
 class TestExactShortestPathInSquare(TestCase):
