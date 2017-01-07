@@ -10,7 +10,7 @@ class TestDijkstra(TestCase):
         cost, path = dijkstra(graph, 0, 1)
 
         self.assertEqual(1, cost)
-        self.assertEqual((0,1), path)
+        self.assertEqual((0, 1), path)
 
     def test_shortestPathInSquare_isAlongDiagonal(self):
         graph = [(0, 1, 1),
@@ -22,6 +22,7 @@ class TestDijkstra(TestCase):
                  (3, 4, sqrt(2) / 2),
                  (2, 3, 1),
                  ]
+        graph += [(e[1], e[0], e[2]) for e in graph]
         cost, path = dijkstra(graph, 0, 3)
         self.assertAlmostEqual(sqrt(2), cost)
-        self.assertEqual((0,4,3), path)
+        self.assertEqual((0, 4, 3), path)
