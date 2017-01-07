@@ -28,7 +28,12 @@ class TestGetPathCost(TestCase):
         self.assertAlmostEqual(sqrt(2), pathFinder.get_path_cost(start, end))
 
 
-class TestShortestPathInSquare(TestCase):
+"""
+Note: all the tests in this class are exact by virtue of the points chosen.
+"""
+
+
+class TestExactShortestPathInSquare(TestCase):
     def setUp(self):
         self.vertices = [(0, 0),
                          (1, 0),
@@ -71,3 +76,21 @@ class TestShortestPathInSquare(TestCase):
                          (1, 3 / 4))
         self.assertAlmostEqual(expected_cost, cost)
         self.assertEqual(expected_path, path)
+
+
+class TestApproximateShortestPathInSquare(TestCase):
+    def setUp(self):
+        self.vertices = [(0, 0),
+                         (0, 1),
+                         (1, 1),
+                         (1, 0)]
+
+        self.triangles = [(0, 1, 3),
+                          (1, 2, 3)]
+
+        self.path_finder = ShortestPathFinder(self.vertices, self.triangles)
+
+    def test_acrossOppositeDiagonal(self):
+        cost, path = self.path_finder.shortest_path((0, 0), (1, 1), subdivisions=4)
+
+        self.assertAlmostEqual(sqrt(2), cost)
