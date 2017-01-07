@@ -20,9 +20,6 @@ def dijkstra(graph, start_vertex, end_vertex):
     :return:
     """
 
-    # Make the graph undirected
-    graph += [(elt[1],elt[0],elt[2]) for elt in graph]
-
     g = defaultdict(list)
     for vertex1, vertex2, weight in graph:
         g[vertex1].append((weight, vertex2))
