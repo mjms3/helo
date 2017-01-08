@@ -11,4 +11,4 @@ triangles = [(0, 1, 3),
 
 path_finder = ShortestPathFinder(vertices, triangles)
 
-path_finder.plot_shortest_path((0,0),(1,1),subdivisions=3)
+path_finder.plot_shortest_path((1/4,1/4),(3/4,3/4),subdivisions=2)

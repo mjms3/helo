@@ -124,7 +124,7 @@ class ShortestPathFinder(object):
             p2 = [float(x) for x in edge[1].split(',')]
             plt.plot([p1[0], p2[0]], [p1[1], p2[1]], 'g')
         plt.triplot(triangulation, 'b-')
-        plt.plot([float(p.split(',')[0]) for p in path], [float(p.split(',')[1]) for p in path], 'r')
+        plt.plot([p[0] for p in path], [p[1] for p in path], 'r')
         plt.xlim([-0.1, 1.1])
         plt.ylim([-0.1, 1.1])
         plt.show()

@@ -73,7 +73,7 @@ class TestExactShortestPathInSquare(TestCase):
         self.assertEqual(expected_path, path)
 
 
-class TestApproximateShortestPathInSquare(TestCase):
+class TestShortestPathInSquareWithSubdivisions(TestCase):
     def setUp(self):
         self.vertices = [(0, 0),
                          (0, 1),
@@ -89,3 +89,9 @@ class TestApproximateShortestPathInSquare(TestCase):
         cost, path = self.path_finder.shortest_path((0, 0), (1, 1), subdivisions=4)
 
         self.assertAlmostEqual(sqrt(2), cost)
+
+    def test_shortenedPathAcrossOppositeDiagonal(self):
+        cost, path = self.path_finder.shortest_path((1 / 4, 1 / 4),
+                                                    (3 / 4, 3 / 4),
+                                                    subdivisions=2)
+        self.assertAlmostEqual(sqrt(2) / 2, cost)
