@@ -133,6 +133,4 @@ class ShortestPathFinder(object):
             plt.plot([p1[0], p2[0]], [p1[1], p2[1]], 'g:',alpha=0.5)
         plt.tripcolor(self.triangulation,self.triangle_weights,cmap=plt.cm.RdYlGn_r)
         plt.plot([p[0] for p in path], [p[1] for p in path], 'k',lw = 3)
-        plt.xlim([-0.1, 1.1])
-        plt.ylim([-0.1, 1.1])
         plt.show()
