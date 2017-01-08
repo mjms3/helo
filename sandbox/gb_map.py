@@ -45,6 +45,6 @@ triangles = [
     [33, 38, 34], [37, 35, 38], [34, 38, 35], [35, 37, 36]]
 
 random.seed(1234)
-path_finder = ShortestPathFinder(vertices,triangles,triangle_weights=[random.random() for _ in triangles])
+path_finder = ShortestPathFinder(vertices,triangles,triangle_weights=[1+5*random.random() for _ in triangles])
 
 path_finder.plot_shortest_path((-0.05, 0.96), (0.000, 0.90), subdivisions=4)

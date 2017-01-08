@@ -131,6 +131,7 @@ class ShortestPathFinder(object):
             p1 = edge[0]
             p2 = edge[1]
             plt.plot([p1[0], p2[0]], [p1[1], p2[1]], 'g:',alpha=0.5)
-        plt.tripcolor(self.triangulation,self.triangle_weights,cmap=plt.cm.RdYlGn_r)
+        tri_plot = plt.tripcolor(self.triangulation,self.triangle_weights,cmap=plt.cm.RdYlGn_r)
         plt.plot([p[0] for p in path], [p[1] for p in path], 'k',lw = 3)
+        plt.colorbar(tri_plot)
         plt.show()
