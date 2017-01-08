@@ -33,7 +33,6 @@ class ShortestPathFinder(object):
         s, e = start, end
         dx = e[0] - s[0]
         dy = e[1] - s[1]
-        m = dy / dx
 
         x0 = s[0] + 1 / 2 * (dx)
         y0 = s[1] + 1 / 2 * (dy)
@@ -42,11 +41,19 @@ class ShortestPathFinder(object):
 
         p = path_mid_point
 
-        y_perp = lambda x: -1 / m * x + (y0 - x0 / m)
-
         eps = 1e-8
-        point1 = (p[0] + eps, p[1] + eps * y_perp(eps))
-        point2 = (p[0] - eps, p[1] - eps * y_perp(eps))
+        if abs(dy) < eps:
+            point1 = (p[0] + eps, p[1])
+            point2 = (p[0] - eps, p[1])
+        elif abs(dx) < eps:
+            point1 = (p[0], p[1] + eps)
+            point2 = (p[0], p[1] - eps)
+        else:
+            m = dy / dx
+            y_perp = lambda x: -1 / m * x + (y0 - x0 / m)
+
+            point1 = (p[0] + eps, p[1] + eps * y_perp(eps))
+            point2 = (p[0] - eps, p[1] - eps * y_perp(eps))
 
         triangle1 = self.tri_finder(*point1)
         triangle2 = self.tri_finder(*point2)
@@ -80,9 +87,9 @@ class ShortestPathFinder(object):
                     new_points.append((x_prime, y_prime))
 
             for edge in itertools.product(new_points, repeat=2):
-                edge_str_1 = '{:.6f},{:.6f}'.format(edge[0][0],edge[0][1])
-                edge_str_2 = '{:.6f},{:.6f}'.format(edge[1][0],edge[1][1])
-                if edge_str_1!=edge_str_2:
+                edge_str_1 = '{:.6f},{:.6f}'.format(edge[0][0], edge[0][1])
+                edge_str_2 = '{:.6f},{:.6f}'.format(edge[1][0], edge[1][1])
+                if edge_str_1 != edge_str_2:
                     graph.append((edge_str_1, edge_str_2, self.get_path_cost(edge[0], edge[1])))
         return list(set(graph))
 

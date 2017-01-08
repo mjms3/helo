@@ -95,3 +95,47 @@ class TestShortestPathInSquareWithSubdivisions(TestCase):
                                                     (3 / 4, 3 / 4),
                                                     subdivisions=2)
         self.assertAlmostEqual(sqrt(2) / 2, cost)
+
+
+class TestShortestPathWithDifferentWeights(TestCase):
+    def setUp(self):
+        self.vertices = [(0, 0),
+                         (1 / 2, 0),
+                         (1, 0),
+                         (1 / 2, 1 / 2),
+                         (0, 1),
+                         (1 / 2, 1),
+                         (1, 1)]
+
+        self.triangles = [(0, 3, 1),
+                          (0, 4, 3),
+                          (3, 4, 5),
+                          (3, 5, 6),
+                          (3, 6, 2),
+                          (1, 3, 2)]
+
+        self.triangle_weights = [1, 1, 1, 2, 2, 2]
+
+        self.path_finder = ShortestPathFinder(self.vertices, self.triangles, triangle_weights=self.triangle_weights)
+
+    def test_unBendingShortestPathsAcrossBoundary(self):
+        s, e = ((0, 1 / 2), (1, 1 / 2))
+
+        for subdivisions in range(1, 3):
+            cost, path = self.path_finder.shortest_path(s, e, subdivisions=subdivisions)
+            self.assertAlmostEqual(1.5, cost,
+                                   msg='Shortest path between {0!s} and {1!s} with {2!s} subdivisions had cost: {3!s}'.format(
+                                       s, e, subdivisions, cost))
+
+
+    def test_unBendingShortestPathAlongBoundary(self):
+        s, e = ((1 / 2, 0), (1 / 2, 1))
+
+        for subdivisions in range(1, 3):
+            cost, path = self.path_finder.shortest_path(s, e, subdivisions=subdivisions)
+            self.assertAlmostEqual(1, cost,
+                                   msg='Shortest path between {0!s} and {1!s} with {2!s} subdivisions had cost: {3!s}'.format(
+                                       s,
+                                       e,
+                                       subdivisions,
+                                       cost))
