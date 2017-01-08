@@ -127,7 +127,6 @@ class TestShortestPathWithDifferentWeights(TestCase):
                                    msg='Shortest path between {0!s} and {1!s} with {2!s} subdivisions had cost: {3!s}'.format(
                                        s, e, subdivisions, cost))
 
-
     def test_unBendingShortestPathAlongBoundary(self):
         s, e = ((1 / 2, 0), (1 / 2, 1))
 
@@ -139,3 +138,20 @@ class TestShortestPathWithDifferentWeights(TestCase):
                                        e,
                                        subdivisions,
                                        cost))
+
+    def test_cornerToCornerPath(self):
+
+        cost, path = self.path_finder.shortest_path((0, 0), (1, 1), subdivisions=8)
+        self.assertAlmostEqual(2.01882, cost, places=2)
+        """In this case, the cost can be found as follows:
+        from math import sqrt
+            from scipy.optimize import fmin
+
+            w1 = 1
+            w2 = 2
+            def time(d):
+                return w1*sqrt(1/4+d**2)+w2*sqrt(1/4+(1-d)**2)
+
+            d_min = fmin(time, 1/2)
+            cost = time(d_min)
+        """
