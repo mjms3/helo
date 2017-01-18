@@ -44,14 +44,12 @@ triangles = [
     [33, 38, 34], [37, 35, 38], [34, 38, 35], [35, 37, 36]]
 
 random.seed(1234)
-path_finder = ShortestPathFinder(vertices, triangles, triangle_weights=[1 + 5 * random.random() for _ in triangles])
+path_finder = ShortestPathFinder(vertices, triangles, triangle_weights=[1 for _ in triangles])
 
 if __name__ == '__main__':
     import sys
 
     start = tuple(float(a) for a in sys.argv[1:3])
     end = tuple(float(a) for a in sys.argv[3:5])
-    cost, points = path_finder.shortest_path(start, end, subdivisions=6)
-    json_output = {'COST': cost,
-                   'POINTS': [[float(c) for c in p] for p in points]}
-    print(json.dumps(json_output))
+    json_output = path_finder.calculate_path_in_json_format(start, end,speed_kts=100, subdivisions=6)
+    print(json_output)

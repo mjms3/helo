@@ -52,11 +52,7 @@ class ESPRequestsHandler(BaseHTTPRequestHandler):
             data_stream = self.rfile.read(int(self.headers['Content-Length']))
             payload = json.loads(data_stream.decode())
             start, end, speed = self._get_and_validate_query(payload)
-            cost, points = self.path_finder.shortest_path(start, end, subdivisions=6)
-            output = {'COST': cost,
-                      'POINTS': [{'lat': str(p[0]),
-                                  'lng': str(p[1])} for p in points]}
-            json_output = json.dumps(output)
+            json_output = self.path_finder.calculate_path_in_json_format(start, end, speed, subdivisions=6)
         except Exception as ex:
             exception_string = str(ex)
             self._return_error(exception_string)

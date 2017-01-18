@@ -37,8 +37,8 @@ class TestServerMethods(TestCase):
                    'end': [0.0, 0.9],
                    'speed': 100}
         response = requests.post(self.url, json=payload)
-        self.assertCountEqual(['COST', 'POINTS'], list(response.json().keys()))
-        self.assertCountEqual(['lat', 'lng'], list(response.json()['POINTS'][0].keys()))
+        self.assertCountEqual(['time_hours', 'path'], list(response.json().keys()))
+        self.assertCountEqual(['lat', 'lng'], list(response.json()['path'][0].keys()))
 
 
 class TestServer_Integration(TestCase):
@@ -56,7 +56,7 @@ class TestServer_Integration(TestCase):
                                           preexec_fn=os.setsid)
 
         # Wait for process to start before carrying out tests
-        for _ in range(100):
+        for _ in range(500):
             try:
                 requests.get('http://localhost:49152')
                 break

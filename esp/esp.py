@@ -1,4 +1,5 @@
-from math import sqrt
+import json
+from math import sqrt, pi
 import decimal
 
 decimal.getcontext().prec = 8
@@ -38,8 +39,7 @@ class ShortestPathFinder(object):
 
         x0 = s[0] + 1 / 2 * (dx)
         y0 = s[1] + 1 / 2 * (dy)
-        path_mid_point = (x0,
-                          y0)
+        path_mid_point = (x0, y0)
 
         p = path_mid_point
 
@@ -94,7 +94,7 @@ class ShortestPathFinder(object):
                     graph.append((edge[0], edge[1], self.get_path_cost(edge[0], edge[1])))
         return list(set(graph))
 
-    def shortest_path(self, start=None, end=None, subdivisions=1):
+    def shortest_path(self, start, end, subdivisions=1):
         start_dec = (Decimal(start[0]), Decimal(start[1]))
         end_dec = (Decimal(end[0]), Decimal(end[1]))
 
@@ -104,6 +104,15 @@ class ShortestPathFinder(object):
                               start_dec, end_dec)
 
         return cost, path
+
+    def calculate_path_in_json_format(self, start, end, speed_kts, subdivisions=1, ):
+        RADIUS_OF_THE_EARTH_kts = 6440
+        RADIANS_TO_DEGREES = 180 / pi
+        cost, path = self.shortest_path(start, end, subdivisions)
+        formatted_output = {'time_hours': cost * RADIUS_OF_THE_EARTH_kts / speed_kts,
+                            'path': [{'lng': '{:.6f}'.format(float(p[0]) * RADIANS_TO_DEGREES),
+                                      'lat': '{:.6f}'.format(float(p[1]) * RADIANS_TO_DEGREES)} for p in path]}
+        return json.dumps(formatted_output)
 
     def _get_new_triangulation(self, start, end):
 
@@ -130,8 +139,8 @@ class ShortestPathFinder(object):
         for edge in graph:
             p1 = edge[0]
             p2 = edge[1]
-            plt.plot([p1[0], p2[0]], [p1[1], p2[1]], 'g:',alpha=0.5)
-        tri_plot = plt.tripcolor(self.triangulation,self.triangle_weights,cmap=plt.cm.RdYlGn_r)
-        plt.plot([p[0] for p in path], [p[1] for p in path], 'k',lw = 3)
+            plt.plot([p1[0], p2[0]], [p1[1], p2[1]], 'g:', alpha=0.5)
+        tri_plot = plt.tripcolor(self.triangulation, self.triangle_weights, cmap=plt.cm.RdYlGn_r)
+        plt.plot([p[0] for p in path], [p[1] for p in path], 'k', lw=3)
         plt.colorbar(tri_plot)
         plt.show()
