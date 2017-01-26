@@ -2,3 +2,5 @@
 *.swp
 .idea
 *.log
+*.json
+data
