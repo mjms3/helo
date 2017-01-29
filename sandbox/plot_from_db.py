@@ -1,5 +1,4 @@
-from collections import defaultdict
-
+import pandas as pd
 import matplotlib
 matplotlib.use('TKAgg')
 
@@ -25,23 +24,30 @@ helicopter_ids = list(session.query(Position_Data.Id).distinct())
 take_off_points = []
 landing_points = []
 
-def is_take_off_point(point, prev):
-    return point.Spd > 20 and prev.Spd < 20
-
-def is_landing_point(point, prev):
-    return point.Spd <20 and prev.Spd > 20
-
-for Id in helicopter_ids:
-    position_data_points = list(session.query(Position_Data).filter_by(Id=Id[0]).all())
-    previous_point = position_data_points[0]
-    for point in position_data_points[1:]:
-        if is_take_off_point(point,previous_point):
-            take_off_points.append((point.Lat, point.Long))
-        elif is_landing_point(point,previous_point):
-            landing_points.append((point.Lat,point.Long))
-        previous_point = point
 
 
+
+def data_frame(query, columns):
+    """
+    Takes a sqlalchemy query and a list of columns, returns a dataframe.
+    """
+    def make_row(x):
+        return dict([(c, getattr(x, c)) for c in columns])
+    return pd.DataFrame([make_row(x) for x in query])
+
+from sqlalchemy import inspect
+import numpy as np
+mapper = inspect(Position_Data)
+cols = [c.key for c in mapper.attrs]
+
+
+for Id in ((4222386,),):# helicopter_ids[1:2]:
+
+    position_data_points = session.query(Position_Data).filter_by(Id=Id[0]).all()
+
+    df = data_frame(position_data_points, cols)
+    df['previous_position']
+    print('foo')
 
 
 m = Basemap(projection='merc',
@@ -50,6 +56,10 @@ m = Basemap(projection='merc',
 m.drawcoastlines()
 take_off_coords =[m(float(p[1]),float(p[0])) for p in take_off_points]
 landing_coords = [m(float(p[1]),float(p[0])) for p in landing_points]
+pos_coords = [m(float(p.Long), float(p.Lat)) for p in position_data_points]
+print(len(take_off_points),len(landing_points))
+
+m.scatter([c[0] for c in pos_coords], [c[1] for c in pos_coords],1,'k')
 m.scatter([c[0] for c in landing_coords], [c[1] for c in landing_coords],3,'b')
 m.scatter([c[0] for c in take_off_coords], [c[1] for c in take_off_coords],3,'r')
 plt.show()
