@@ -42,6 +42,9 @@ def upgrade():
                     sa.Column('TimeStamp', sa.DateTime)
                     )
 
+    op.create_primary_key('pk_position_data','position_data',['Id', 'TimeStamp'])
+
+
 
 def downgrade():
     op.drop_table('position_data')

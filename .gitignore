@@ -4,3 +4,4 @@
 *.log
 *.json
 data
+external_packages
