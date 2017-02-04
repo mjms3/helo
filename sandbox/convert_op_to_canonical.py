@@ -7,11 +7,16 @@ data_layer = DataAbstractionLayer()
 
 canonical_list_file = 'canonical-list.txt'
 
-with open(canonical_list_file,'r') as in_file:
-    canonical_list = [l.strip().encode('ascii', errors='ignore').decode() for l in in_file.readlines()]
+with open(canonical_list_file, 'r') as in_file:
+    canonical_list = [l.strip().lower().replace('limited', 'ltd').encode('ascii', errors='ignore').decode() for l in in_file.readlines()]
 
 
 operators_present = [r[0] for r in data_layer.session.query(PositionData.Op).distinct()]
+
+with open('operators_present.txt','w') as out_file:
+    for op in operators_present:
+        out_file.write(op)
+        out_file.write('\n')
 
 
 operators_to_ignore = []
@@ -26,7 +31,7 @@ for op in operators_present:
     else:
         synonymn_lists[closest_match].append(op)
 
-with open('synonymns_list.txt','w') as out_file:
+with open('synonyms_list.txt','w') as out_file:
     for k, v in synonymn_lists.items():
         out_file.write('{}\t{}\n'.format(k,repr(v)))
 
