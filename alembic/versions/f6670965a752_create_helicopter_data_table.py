@@ -17,6 +17,7 @@ depends_on = None
 
 def upgrade():
     op.create_table('position_data',
+                    sa.Column('position_data_id', sa.Integer, primary_key=True),
                     sa.Column('Id', sa.Integer),
                     sa.Column('Icao', sa.Text),
                     sa.Column('Reg', sa.Text),
@@ -42,9 +43,7 @@ def upgrade():
                     sa.Column('TimeStamp', sa.DateTime)
                     )
 
-    op.create_primary_key('pk_position_data','position_data',['Id', 'TimeStamp'])
-
-
+    op.create_unique_constraint('uq_position_data', 'position_data', ['Id', 'TimeStamp'])
 
 def downgrade():
     op.drop_table('position_data')
