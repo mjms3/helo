@@ -1,4 +1,5 @@
-import numpy as np
+from sandbox.show_common_routes import MIN_LAT, MIN_LONG, MAX_LAT, MAX_LONG
+
 
 def great_circle_time(start,end):
     distance = great_circle_distance(end, start)
@@ -31,3 +32,31 @@ def get_route_details(route,m=None):
     return ('{:4f}'.format(start.Lat), '{:4f}'.format(start.Long), '{:4f}'.format(end.Lat), '{:4f}'.format(end.Long),
             (end.TimeStamp - start.TimeStamp).total_seconds()/60, len(route_points),
           great_circle_distance(start, end), average_speed, end.Op, end.Reg, end.Type)
+
+if __name__=='__main__':
+    import matplotlib
+    from mpl_toolkits.basemap import Basemap
+
+    matplotlib.use('TkAgg')
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    from sandbox.data_access_layer import DataAccessLayer
+
+    dal = DataAccessLayer()
+
+    routes = dal.session.query(dal.tbls.routes).all()
+    start_lat = MIN_LAT
+    start_long= MIN_LONG
+    end_lat = MAX_LAT
+    end_long = MAX_LONG
+    MAP_BOUNDS = 0.5
+    m = Basemap(projection='merc',
+                resolution='l', llcrnrlat=min(start_lat, end_lat) - MAP_BOUNDS, llcrnrlon=min(start_long, end_long) - MAP_BOUNDS,
+                urcrnrlat=max(start_lat, end_lat) + MAP_BOUNDS, urcrnrlon=max(start_long, end_long) + MAP_BOUNDS)
+
+    m.drawcoastlines()
+    for route in routes:
+        get_route_details(route, m)
+    plt.show()
+    input('')

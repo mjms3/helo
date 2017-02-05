@@ -9,5 +9,6 @@ _Base.prepare(_engine, reflect=True)
 _session = Session(_engine)
 
 class DataAccessLayer(object):
+    engine = _engine
     session = _session
     tbls = _Base.classes
