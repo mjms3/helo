@@ -1,100 +1,64 @@
-from collections import namedtuple
-from datetime import timedelta
+from datetime import datetime
+from itertools import groupby
+from operator import attrgetter
 
-import numpy as np
-import pandas as pd
-from sqlalchemy import inspect
+from sqlalchemy.sql.expression import and_
 
-from data_utilities.data_access_layer import DataAccessLayer
+from data_utilities.common_components import position_reading_date_filter
+from data_utilities.data_access_layer import DataAccessLayer, Routes
+from esp.distance_utils import great_circle_distance
 
 dal = DataAccessLayer()
+PositionReadings = dal.tbls['position_readings']
 
 
-def data_frame(query, columns):
-    """
-    Takes a sqlalchemy query and a list of columns, returns a dataframe.
-    """
-
-    def make_row(x):
-        return dict([(c, getattr(x, c)) for c in columns])
-
-    return pd.DataFrame([make_row(x) for x in query])
+def get_ordered_position_recordings_for_date(date):
+    ordered_records = dal.session.query(PositionReadings).filter(position_reading_date_filter(date)).order_by(
+        PositionReadings.c.helicopter_id,
+        PositionReadings.c.time_stamp).all()
+    return ordered_records
 
 
-mapper = inspect(Position_Data)
-cols = [c.key for c in mapper.attrs]
+def get_number_of_position_records_for_date(date):
+    return dal.session.query(PositionReadings).filter(position_reading_date_filter(date)).count()
 
 
-class Route(object):
-    def __init__(self):
-        self.points = []
-        self.position_data_points = []
-
-    def get_starting_row(self):
-        return self.points[0]
-
-    def get_ending_row(self):
-        return self.points[-1]
-
-    def get_starting_coord(self):
-        starting_row = self.get_starting_row()
-        return (float(starting_row['Lat']), float(starting_row['Long']))
-
-    def get_ending_coord(self):
-        ending_row = self.get_ending_row()
-        return (float(ending_row['Lat']), float(ending_row['Long']))
-
-    def get_points(self):
-        return [(float(p['Lat']), float(p['Long'])) for p in self.points]
+def potential_new_route_condition(row):
+    if row.minutes_since_last_reading is None or row.calculated_speed is None:
+        return False
+    if row.minutes_since_last_reading > 30 or row.calculated_speed < 1e-6:
+        return True
 
 
-def process_data_frame(df,query):
-    routes = [Route()]
-    current_route = routes[0]
-    for (_, row), position_data in zip(df.iterrows(),query):
-        if row['TimeStamp_diff'] > timedelta(minutes=30) or row['calculated_speed'] < 1e-1:
-            routes.append(Route())
-            current_route = routes[-1]
-        if row['calculated_speed'] > 1e-1:
-            current_route.points.append(row)
-            current_route.position_data_points.append(position_data)
-    return routes
+def route_points_are_valid(route_records):
+    if len(route_records) > 30 and great_circle_distance(route_records[0],
+                                                         route_records[-1]) > 40:
+        return True
+    return False
 
 
-def get_df_from_position_data(position_data_points):
-    df = data_frame(position_data_points, cols)
-    df['position_norm'] = df.apply(lambda row: float(np.sqrt(row['Lat'] ** 2 + row['Long'] ** 2)) * np.pi / 180, axis=1)
-    df['TimeStamp_diff'] = df['TimeStamp'].diff()
-    df['position_norm_diff'] = df['position_norm'].diff()
-    df['calculated_speed'] = abs(df['position_norm_diff'] / df['TimeStamp_diff'].dt.total_seconds() * 6400 * 3600)
-    return df
+def potential_new_route_marker(position_reading_row, route_count=[0]):
+    if potential_new_route_condition(position_reading_row):
+        return_value = route_count[0] = route_count[0] + 1
+    else:
+        return_value = route_count[0]
+    return return_value
 
-point_tuple = namedtuple('Point','Lat Long')
 
-for helicopter in relevant_helicopters:
-    Id = helicopter.position_data_Id
-    position_data_points = list(dal.session.query(Position_Data).filter_by(Id=Id).all())
-    df = get_df_from_position_data(position_data_points)
-    route_list = process_data_frame(df,position_data_points)
-    for r in route_list:
-        if len(r.points) > 30:
-            route_start_lat, route_start_long = r.get_starting_coord()
-            route_end_lat, route_end_long = r.get_ending_coord()
-            start = point_tuple(Lat=route_start_lat,Long=route_start_long)
-            end = point_tuple(Lat=route_end_lat,Long=route_end_long)
-            if great_circle_distance(end, start)>40:
-
-                route = dal.tbls.routes(route_start_lat=route_start_lat,
-                                        route_start_long=route_start_long,
-                                        route_end_lat=route_end_lat,
-                                        route_end_long=route_end_long,
-                                        helicopter_id=helicopter.helicopter_id)
-                dal.session.add(route)
-                dal.session.commit()
-                for point in r.position_data_points:
-                    pdr_rel = dal.tbls.position_data_routes_rel(route_id=route.route_id,
-                                                                position_data_id=point.position_data_id)
-                    dal.session.add(pdr_rel)
+date = datetime(2016, 6, 20)
+for helicopter_id, position_records in groupby(get_ordered_position_recordings_for_date(date),
+                                               attrgetter('helicopter_id')):
+    for local_route_id, route_records in groupby(position_records,
+                                                 potential_new_route_marker):
+        route_records_list = list(route_records)
+        if route_points_are_valid(route_records_list):
+            route = Routes(distance_travelled=sum(r.knots_moved_since_last_reading for r in route_records_list if r.knots_moved_since_last_reading is not None),
+                           elapsed_time_min=sum(r.minutes_since_last_reading for r in route_records_list if r.minutes_since_last_reading is not None),
+                           )
+            dal.session.add(route)
             dal.session.commit()
 
-
+            dal.engine.execute(PositionReadings.update().where(and_(PositionReadings.c.helicopter_id==helicopter_id,
+                                                                  PositionReadings.c.time_stamp.between(route_records_list[0].time_stamp,
+                                                                                                        route_records_list[-1].time_stamp))).values(route_id=route.route_id))
+            dal.session.commit()

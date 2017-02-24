@@ -3,6 +3,7 @@ import datetime
 import numpy as np
 from sqlalchemy.sql.expression import bindparam, and_
 
+from data_utilities.common_components import position_reading_date_filter
 from data_utilities.data_access_layer import DataAccessLayer
 from esp.distance_utils import SECONDS_TO_MINUTES, great_circle_distance_np, MINUTES_PER_HOUR
 
@@ -14,10 +15,7 @@ Helicopters = dal.tbls['helicopters']
 
 def get_position_records_for_date(helicopter, date):
     position_records = dal.session.query(PositionReadings).filter(PositionReadings.c.helicopter_id == helicopter,
-                                                                  PositionReadings.c.time_stamp.between(
-                                                                      date.combine(date, datetime.time(0)),
-                                                                      date.combine(date,
-                                                                                   datetime.time(23, 59, 59)))).all()
+                                                                  position_reading_date_filter(date)).all()
 
     return position_records
 

@@ -26,10 +26,10 @@ def distance_from_lat_and_long(dLat, dLong, lat1, lat2):
     return 2 * np.arcsin(np.sqrt(np.sin(dLat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dLong / 2) ** 2))
 
 
-def great_circle_distance(end, start):
-    lat1 = float(start.Lat) * DEGREES_TO_RADIANS
-    lat2 = float(end.Lat) * DEGREES_TO_RADIANS
+def great_circle_distance(start, end):
+    lat1 = float(start.latitude) * DEGREES_TO_RADIANS
+    lat2 = float(end.latitude) * DEGREES_TO_RADIANS
     dLat = lat1 - lat2
-    dLong = float(start.Long - end.Long) * DEGREES_TO_RADIANS
+    dLong = float(start.longitude - end.longitude) * DEGREES_TO_RADIANS
     dAngle = distance_from_lat_and_long(dLat, dLong, lat1, lat2)
     return RADIANS_TO_KNOTS * dAngle
