@@ -1,4 +1,5 @@
-from sandbox.show_common_routes import MIN_LAT, MIN_LONG, MAX_LAT, MAX_LONG
+from sandbox import MIN_LONG, MAX_LONG, MIN_LAT, MAX_LAT
+import numpy as np
 
 
 def great_circle_time(start,end):
@@ -58,5 +59,4 @@ if __name__=='__main__':
     m.drawcoastlines()
     for route in routes:
         get_route_details(route, m)
-    plt.show()
-    input('')
+    plt.savefig('all_routes.png',dpi=300)

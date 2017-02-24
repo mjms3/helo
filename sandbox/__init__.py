@@ -1,0 +1,4 @@
+MIN_LONG = -6
+MAX_LONG = 2
+MIN_LAT = 50
+MAX_LAT = 59
