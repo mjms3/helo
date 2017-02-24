@@ -62,8 +62,9 @@ def upgrade():
                     sa.Column('bearing', sa.Numeric(precision=9, scale=6), nullable=True),
                     sa.Column('minutes_since_last_reading', sa.Integer(), nullable=True),
                     sa.Column('knots_moved_since_last_reading', sa.Numeric(precision=18, scale=8), nullable=True),
+                    sa.Column('calculated_speed', sa.Numeric(precision=18, scale=8), nullable=True),
                     sa.Column('route_id', sa.Integer(), nullable=True),
-                    sa.Column('time_stamp',sa.DateTime(), nullable=False),
+                    sa.Column('time_stamp', sa.DateTime(), nullable=False),
                     sa.ForeignKeyConstraint(['helicopter_id'], ['helicopters.helicopter_id'], ),
                     sa.ForeignKeyConstraint(['route_id'], ['routes.route_id'], ),
                     sa.PrimaryKeyConstraint('position_reading_id')

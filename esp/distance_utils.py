@@ -3,6 +3,7 @@ import numpy as np
 DEGREES_TO_RADIANS = np.pi / 180
 RADIANS_TO_KNOTS = 6400  # Radius of the earth in Knots
 SECONDS_TO_MINUTES = 1/60
+MINUTES_PER_HOUR = 60
 
 
 def great_circle_time(start, end):

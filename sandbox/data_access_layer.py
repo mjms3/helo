@@ -85,7 +85,7 @@ class PositionReadings(_Base):
     knots_moved_since_last_reading = sa.Column(sa.Numeric(precision=18, scale=8), nullable=True)
     route_id = sa.Column(sa.Integer, sa.ForeignKey('routes.route_id'), nullable=True)
     time_stamp = sa.Column(sa.DateTime, nullable=False)
-
+    calculated_speed = sa.Column(sa.Numeric(precision=18, scale=8), nullable=True)
     uq_position_reading_heli_time = sa.UniqueConstraint('helicopter_id', 'time_stamp')
 
 
