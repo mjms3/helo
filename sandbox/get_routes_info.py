@@ -2,20 +2,7 @@ from sandbox import MIN_LONG, MAX_LONG, MIN_LAT, MAX_LAT
 import numpy as np
 
 
-def great_circle_time(start,end):
-    distance = great_circle_distance(end, start)
-    elapsed_time = end.TimeStamp - start.TimeStamp
-    return distance/elapsed_time.seconds*3600
 
-
-def great_circle_distance(end, start):
-    lat1 = float(start.Lat) * np.pi / 180
-    lat2 = float(end.Lat) * np.pi / 180
-    dLat = lat1 - lat2
-    dLong = float(start.Long - end.Long) * np.pi / 180
-    dAngle = 2 * np.arcsin(np.sqrt(np.sin(dLat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dLong / 2) ** 2))
-    distance = 6400 * dAngle
-    return distance
 
 
 

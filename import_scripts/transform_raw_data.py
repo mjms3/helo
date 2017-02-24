@@ -1,10 +1,4 @@
 from sandbox.data_access_layer import DataAccessLayer
-import logging
-
-logging.basicConfig(filename='transform_raw_data.log',
-                    level=logging.DEBUG)
-
-_log = logging.getLogger()
 dal = DataAccessLayer()
 
 RawData = dal.tbls['raw_data']
