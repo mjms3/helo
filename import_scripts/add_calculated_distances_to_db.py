@@ -41,13 +41,12 @@ def update_position_records(position_records):
         minutes_since_last_reading=bindparam('time_elapsed'),
         knots_moved_since_last_reading=bindparam('pos_change'),
         calculated_speed=bindparam('calc_speed'))
-    dal.engine.execute(stmt, [{
-                                  '_helicopter_id': r.helicopter_id,
-                                  '_time_stamp': r.time_stamp,
-                                  'time_elapsed': delta_t,
-                                  'pos_change': delta_x,
-                                  'calc_speed': speed,
-                              } for r, delta_t, delta_x, speed in
+    dal.engine.execute(stmt, [{'_helicopter_id': r.helicopter_id,
+                               '_time_stamp': r.time_stamp,
+                               'time_elapsed': delta_t,
+                               'pos_change': delta_x,
+                               'calc_speed': speed,
+                               } for r, delta_t, delta_x, speed in
                               zip(position_records[1:], time_deltas_minutes, pos_change, calc_speed)])
     dal.session.commit()
 
