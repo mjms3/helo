@@ -1,9 +1,4 @@
 from sandbox import MIN_LONG, MAX_LONG, MIN_LAT, MAX_LAT
-import numpy as np
-
-
-
-
 
 
 def get_route_details(route,m=None):
@@ -26,10 +21,9 @@ if __name__=='__main__':
     from mpl_toolkits.basemap import Basemap
 
     matplotlib.use('TkAgg')
-    import numpy as np
     import matplotlib.pyplot as plt
 
-    from sandbox.data_access_layer import DataAccessLayer
+    from data_utilities.data_access_layer import DataAccessLayer
 
     dal = DataAccessLayer()
 

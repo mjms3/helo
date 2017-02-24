@@ -5,7 +5,7 @@ from collections import namedtuple
 
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
-from sandbox.data_access_layer import DataAccessLayer
+from data_utilities.data_access_layer import DataAccessLayer
 from sandbox.get_routes_info import get_route_details
 
 dal = DataAccessLayer()

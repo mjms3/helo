@@ -2,7 +2,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 from mpl_toolkits.basemap import Basemap
 
-from sandbox.data_access_layer import DataAccessLayer
+from data_utilities.data_access_layer import DataAccessLayer
 import matplotlib.pyplot as plt
 
 dal = DataAccessLayer()

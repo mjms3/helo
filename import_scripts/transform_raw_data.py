@@ -1,4 +1,4 @@
-from sandbox.data_access_layer import DataAccessLayer
+from data_utilities.data_access_layer import DataAccessLayer
 dal = DataAccessLayer()
 
 RawData = dal.tbls['raw_data']

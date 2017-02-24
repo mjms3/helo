@@ -5,13 +5,9 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import inspect
 
-from sandbox.data_access_layer import DataAccessLayer
-from sandbox.get_routes_info import great_circle_distance
+from data_utilities.data_access_layer import DataAccessLayer
 
 dal = DataAccessLayer()
-Position_Data = dal.tbls.position_data
-
-relevant_helicopters = dal.session.query(dal.tbls.helicopters).all()
 
 
 def data_frame(query, columns):
