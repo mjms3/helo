@@ -31,10 +31,8 @@ def potential_new_route_condition(row):
 
 
 def route_points_are_valid(route_records):
-    if len(route_records) > 30 and great_circle_distance(route_records[0],
-                                                         route_records[-1]) > 40:
-        return True
-    return False
+    return len(route_records) > 30 and great_circle_distance(route_records[0],
+                                                             route_records[-1]) > 40
 
 
 def potential_new_route_marker(position_reading_row, route_count=[0]):
@@ -45,20 +43,29 @@ def potential_new_route_marker(position_reading_row, route_count=[0]):
     return return_value
 
 
-date = datetime(2016, 6, 20)
-for helicopter_id, position_records in groupby(get_ordered_position_recordings_for_date(date),
-                                               attrgetter('helicopter_id')):
-    for local_route_id, route_records in groupby(position_records,
-                                                 potential_new_route_marker):
-        route_records_list = list(route_records)
-        if route_points_are_valid(route_records_list):
-            route = Routes(distance_travelled=sum(r.knots_moved_since_last_reading for r in route_records_list if r.knots_moved_since_last_reading is not None),
-                           elapsed_time_min=sum(r.minutes_since_last_reading for r in route_records_list if r.minutes_since_last_reading is not None),
-                           )
-            dal.session.add(route)
-            dal.session.commit()
+def create_routes_for_date(date):
+    for helicopter_id, position_records in groupby(get_ordered_position_recordings_for_date(date),
+                                                   attrgetter('helicopter_id')):
+        for local_route_id, route_records in groupby(position_records,
+                                                     potential_new_route_marker):
+            route_records_list = list(route_records)
+            if route_points_are_valid(route_records_list):
+                route = Routes(distance_travelled=sum(r.knots_moved_since_last_reading for r in route_records_list if
+                                                      r.knots_moved_since_last_reading is not None),
+                               elapsed_time_min=sum(r.minutes_since_last_reading for r in route_records_list if
+                                                    r.minutes_since_last_reading is not None),
+                               )
+                dal.session.add(route)
+                dal.session.commit()
 
-            dal.engine.execute(PositionReadings.update().where(and_(PositionReadings.c.helicopter_id==helicopter_id,
-                                                                  PositionReadings.c.time_stamp.between(route_records_list[0].time_stamp,
-                                                                                                        route_records_list[-1].time_stamp))).values(route_id=route.route_id))
-            dal.session.commit()
+                dal.engine.execute(
+                    PositionReadings.update().where(and_(PositionReadings.c.helicopter_id == helicopter_id,
+                                                         PositionReadings.c.time_stamp.between(
+                                                             route_records_list[0].time_stamp,
+                                                             route_records_list[-1].time_stamp))).values(
+                        route_id=route.route_id))
+                dal.session.commit()
+
+
+date = datetime(2016, 6, 20)
+create_routes_for_date(date)
