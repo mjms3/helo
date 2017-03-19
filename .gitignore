@@ -3,6 +3,9 @@
 .idea
 *.log
 *.json
+*.png
+*.jpg
+*.mp4
 data
 external_packages
 .ipynb_checkpoints
