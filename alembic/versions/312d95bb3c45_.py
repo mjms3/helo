@@ -16,28 +16,29 @@ depends_on = None
 
 
 def upgrade():
-    op.create_table('canonical_operators',
+    op.create_table('canonical_operator',
                     sa.Column('canonical_operator_id', sa.Integer(), nullable=False),
                     sa.Column('canonical_operator_name', sa.Text(), nullable=True),
                     sa.PrimaryKeyConstraint('canonical_operator_id'),
                     )
-    op.create_table('routes',
+    op.create_table('route',
                     sa.Column('route_id', sa.Integer(), nullable=False),
                     sa.Column('elapsed_time_min', sa.Integer(), nullable=False),
                     sa.Column('distance_travelled', sa.Numeric(precision=18, scale=8), nullable=False),
                     sa.PrimaryKeyConstraint('route_id'),
                     )
-    op.create_table('operators',
+    op.create_table('operator',
                     sa.Column('operator_id', sa.Integer(), nullable=False),
                     sa.Column('operator_name', sa.String(191), nullable=True),
                     sa.Column('is_military', sa.Boolean(), nullable=True),
                     sa.Column('canonical_operator_id', sa.Integer(), nullable=True),
-                    sa.Column('operator_country', sa.Text(), nullable=True),
-                    sa.ForeignKeyConstraint(['canonical_operator_id'], ['canonical_operators.canonical_operator_id'], ),
+                    sa.Column('operator_country', sa.String(191), nullable=True),
+                    sa.ForeignKeyConstraint(['canonical_operator_id'], ['canonical_operator.canonical_operator_id'], ),
                     sa.PrimaryKeyConstraint('operator_id'),
-                    sa.UniqueConstraint('operator_name')
                     )
-    op.create_table('helicopters',
+
+    op.create_unique_constraint('uq_operator_name_country', 'operator', ['operator_name','operator_country'])
+    op.create_table('helicopter',
                     sa.Column('helicopter_id', sa.Integer(), nullable=False),
                     sa.Column('helicopter_data_source_id', sa.Integer(), nullable=False),
                     sa.Column('icao', sa.String(6), nullable=False),
@@ -45,13 +46,13 @@ def upgrade():
                     sa.Column('helicopter_type', sa.Text(), nullable=False),
                     sa.Column('helicopter_model', sa.Text(), nullable=False),
                     sa.Column('helicopter_operator_id', sa.Integer(), nullable=False),
-                    sa.ForeignKeyConstraint(['helicopter_operator_id'], ['operators.operator_id'], ),
+                    sa.ForeignKeyConstraint(['helicopter_operator_id'], ['operator.operator_id'], ),
                     sa.PrimaryKeyConstraint('helicopter_id'),
                     sa.UniqueConstraint('helicopter_data_source_id'),
                     sa.UniqueConstraint('icao'),
                     sa.UniqueConstraint('registration'),
                     )
-    op.create_table('position_readings',
+    op.create_table('position_reading',
                     sa.Column('position_reading_id', sa.Integer(), nullable=False),
                     sa.Column('helicopter_id', sa.Integer(), nullable=False),
                     sa.Column('latitude', sa.Numeric(precision=9, scale=6), nullable=False),
@@ -65,17 +66,17 @@ def upgrade():
                     sa.Column('calculated_speed', sa.Numeric(precision=18, scale=8), nullable=True),
                     sa.Column('route_id', sa.Integer(), nullable=True),
                     sa.Column('time_stamp', sa.DateTime(), nullable=False),
-                    sa.ForeignKeyConstraint(['helicopter_id'], ['helicopters.helicopter_id'], ),
-                    sa.ForeignKeyConstraint(['route_id'], ['routes.route_id'], ),
+                    sa.ForeignKeyConstraint(['helicopter_id'], ['helicopter.helicopter_id'], ),
+                    sa.ForeignKeyConstraint(['route_id'], ['route.route_id'], ),
                     sa.PrimaryKeyConstraint('position_reading_id')
                     )
 
-    op.create_unique_constraint('uq_position_reading_heli_time', 'position_readings', ['helicopter_id', 'time_stamp'])
+    op.create_unique_constraint('uq_position_reading_heli_time', 'position_reading', ['helicopter_id', 'time_stamp'])
 
 
 def downgrade():
-    op.drop_table('position_readings')
-    op.drop_table('helicopters')
-    op.drop_table('operators')
-    op.drop_table('routes')
-    op.drop_table('canonical_operators')
+    op.drop_table('position_reading')
+    op.drop_table('helicopter')
+    op.drop_table('operator')
+    op.drop_table('route')
+    op.drop_table('canonical_operator')

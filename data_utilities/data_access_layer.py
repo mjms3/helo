@@ -37,44 +37,45 @@ class RawData(_Base):
     uq_raw_data = sa.UniqueConstraint('Id', 'TimeStamp')
 
 
-class CanonicalOperators(_Base):
-    __tablename__ = 'canonical_operators'
+class CanonicalOperator(_Base):
+    __tablename__ = 'canonical_operator'
     canonical_operator_id = sa.Column(sa.Integer, primary_key=True)
     canonical_operator_name = sa.Column(sa.Text)
 
 
-class Operators(_Base):
-    __tablename__ = 'operators'
+class Operator(_Base):
+    __tablename__ = 'operator'
     operator_id = sa.Column(sa.Integer, primary_key=True)
-    operator_name = sa.Column(sa.String(191), unique=True)
+    operator_name = sa.Column(sa.String(191))
     is_military = sa.Column(sa.Boolean)
-    canonical_operator_id = sa.Column(sa.Integer, sa.ForeignKey('canonical_operators.canonical_operator_id'),
+    canonical_operator_id = sa.Column(sa.Integer, sa.ForeignKey('canonical_operator.canonical_operator_id'),
                                       nullable=True)
-    operator_country = sa.Column(sa.Text, default='United Kingdom')
+    operator_country = sa.Column(sa.String(191), default='United Kingdom')
+    uq_operator_name_country = sa.UniqueConstraint('operator_name','operator_country')
 
 
-class Helicopters(_Base):
-    __tablename__ = 'helicopters'
+class Helicopter(_Base):
+    __tablename__ = 'helicopter'
     helicopter_id = sa.Column(sa.Integer, primary_key=True)
     helicopter_data_source_id = sa.Column(sa.Integer, nullable=False, unique=True)
     icao = sa.Column(sa.String(6), nullable=False, unique=True)
     registration = sa.Column(sa.String(10), nullable=False, unique=True)
     helicopter_type = sa.Column(sa.Text, nullable=False)
     helicopter_model = sa.Column(sa.Text, nullable=False)
-    helicopter_operator_id = sa.Column(sa.Integer, sa.ForeignKey('operators.operator_id'), nullable=False)
+    helicopter_operator_id = sa.Column(sa.Integer, sa.ForeignKey('operator.operator_id'), nullable=False)
 
 
-class Routes(_Base):
-    __tablename__ = 'routes'
+class Route(_Base):
+    __tablename__ = 'route'
     route_id = sa.Column(sa.Integer, primary_key=True)
     elapsed_time_min = sa.Column(sa.Integer, nullable=False)
     distance_travelled = sa.Column(sa.Numeric(precision=18, scale=8), nullable=False)
 
 
-class PositionReadings(_Base):
-    __tablename__ = 'position_readings'
+class PositionReading(_Base):
+    __tablename__ = 'position_reading'
     position_reading_id = sa.Column(sa.Integer, primary_key=True)
-    helicopter_id = sa.Column(sa.Integer, sa.ForeignKey('helicopters.helicopter_id'), nullable=False)
+    helicopter_id = sa.Column(sa.Integer, sa.ForeignKey('helicopter.helicopter_id'), nullable=False)
     latitude = sa.Column(sa.Numeric(precision=9, scale=6), nullable=False)
     longitude = sa.Column(sa.Numeric(precision=9, scale=6), nullable=False)
     altitude = sa.Column(sa.Integer, nullable=True)
@@ -83,7 +84,7 @@ class PositionReadings(_Base):
     bearing = sa.Column(sa.Numeric(precision=9, scale=6), nullable=True)
     minutes_since_last_reading = sa.Column(sa.Integer, nullable=True)
     knots_moved_since_last_reading = sa.Column(sa.Numeric(precision=18, scale=8), nullable=True)
-    route_id = sa.Column(sa.Integer, sa.ForeignKey('routes.route_id'), nullable=True)
+    route_id = sa.Column(sa.Integer, sa.ForeignKey('route.route_id'), nullable=True)
     time_stamp = sa.Column(sa.DateTime, nullable=False)
     calculated_speed = sa.Column(sa.Numeric(precision=18, scale=8), nullable=True)
     uq_position_reading_heli_time = sa.UniqueConstraint('helicopter_id', 'time_stamp')
